@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+        integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="./js/vue.global.js"></script>
+    <script src="./js/vuex.global.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/reset.css">
+    <title>M-SPAWNSELECTOR</title>
+</head>
+
+<body>
+    <div id="app" style="display: none">
+        <div class="app-container" v-if="display" :class="{'transparent': selectedSpawn}">
+            <div class="header">
+                <div class="logo">
+                    <img src="https://cdn.discordapp.com/attachments/1102219196127006740/1102219569176776744/Group_1322_3.png" alt="pdm">
+                </div>
+                <div class="title">
+                    {{isEditor ? 'SPAWN EDITOR' : 'SPAWN SELECTION'}}
+                </div>
+                <div class="user">
+                    <div class="info">
+                        <div class="name">
+                            {{player.name}}
+                        </div>
+                        <div class="accent">
+                            {{player.jobName}}
+                        </div>
+                    </div>
+                    <div class="image">
+                        <img v-if="player.avatar" :src="player.avatar" alt="pp">
+                        <img v-if="!player.avatar" src="./assets/pp.png" alt="">
+                    </div>
+                </div>
+            </div>
+            <div class="page-container">
+                <div class="modal-container" v-if="modalActive">
+                    <div class="location active" v-if="modalContent.type === 'new-spawn'"
+                        :style="{'--bg-img': `url(${this.findModalInput('cardImage', 'value') || '\'../../assets/location-preview.png\''})`, '--color': this.findModalInput('cardColor', 'value')}">
+                        <div class="title">
+                            {{this.findModalInput('state', 'value') || 'New Spawn Point'}}
+                        </div>
+                        <div class="name">
+                            {{this.findModalInput('point', 'value') || 'Card Background'}}
+                        </div>
+                    </div>
+                    <div class="modal-box" :class="modalContent.content">
+                        <div class="title">
+                            {{modalContent.title}}
+                        </div>
+                        <div class="content">
+                            <div class="text" v-if="modalContent.content === 'text'">
+                                {{modalContent.text}}
+                            </div>
+                            <div class="input" v-if="modalContent.content === 'input'">
+                                <input type="text" :placeholder="modalContent.placeholder" :maxlength="modalContent.maxlength" v-model="modalContent.input">
+                            </div>
+                            <div class="form" v-if="modalContent.content === 'form'">
+                                <div class="input" v-for="input in modalContent.fields" >
+                                    <span v-if="input.label" class="label">
+                                        {{input.label}}
+                                    </span>
+                                    <div class="input-area" :class="{'button': input.button}">
+                                        <input :type="input.type || 'text'" :placeholder="input.placeholder" :maxlength="input.maxlength" v-model="input.value">
+                                        <button v-if="input.button" class="button" @click="input.button.handler && input.button.handler(input.value)">
+                                            {{input.button.text}}
+
+                                            <input v-if="input.button.type == 'color'" type="color" v-model="input.value" class="color-picker">
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons" v-if="modalContent.buttons" :style="{'--btn-count': modalContent.buttons.length}">
+                            <button v-for="button in modalContent.buttons" :class="button.class" @click="modalButtonHandler(button.value)">
+                                {{button.text}}
+                            </button>
+                        </div>
+                        <!-- <button v-if="modalContent.type === 'new-spawn'" class="get-pos" @click="getCameraPosition()">
+                            Get Player Camera Position
+                        </button> -->
+                        <div class="buttons" v-else style="--btn-count: 1">
+                            <button class="red" @click="closeModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+                <component v-if="activePage" :is="activePage"></component>
+            </div>
+        </div>
+    </div>
+    <script src="./js/app.js" type="module"></script>
+</body>
+
+</html>

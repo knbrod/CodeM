@@ -1,0 +1,93 @@
+<div class="page">
+    <div class="top-glow" :style="{'--color': selectedSpawn?.cardColor}"></div>
+    <main>
+        <div class="content">
+            <div class="players-text">
+                {{!selectedSpawn ? config.welcomeMessage : `${playersAround[selectedSpawn.id] || 0} Players In This Area`}}
+            </div>
+            <div class="center-text empty" v-if="!selectedSpawn">
+                <span>
+                    SELECT
+                </span>
+                <span>
+                    A
+                </span>
+                <span>
+                    SPAWN POINT
+                </span>
+            </div>
+            <div class="center-text" v-else>
+                <span>
+                    {{selectedSpawn.state}}
+                </span>
+                <span>
+                    {{selectedSpawn.point}}
+                </span>
+            </div>
+            <button :style="{'--color': selectedSpawn?.buttonColor, 'color': selectedSpawn?.buttonText}" @click="selectSpawn()" v-if="isQBCore">
+                SPAWN
+            </button>
+        </div>
+        <nav class="locations">
+            <div class="locations-wrapper" ref="locationsWrapper" @wheel="scrollLocations" :class="{'editor-mode': isEditor}">
+                <div class="location new" ref="location-new" v-if="isEditor" @click="newLocation" :style="{'--bg-img': `url('../../assets/location-new.png')`}">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="location" v-for="(spawn, index) in spawns" :key="index" @click="selectLocation(spawn)" :class="{'active': spawn.id == selectedSpawn?.id || isEditor}"
+                    :style="{'--bg-img': `url(${spawn.cardImage})`, '--color': spawn.cardColor}" :ref="'location-' + (isEditor ? index + 1 : index)">
+                    <div class="active-glow" v-if="spawn.id == selectedSpawn?.id || isEditor"></div>
+                    <div class="title">
+                        {{spawn.state}}
+                    </div>
+                    <div class="name">
+                        {{spawn.point}}
+                    </div>
+
+                    <div class="buttons" v-if="isEditor">
+                        <button @click.stop="editLocation(spawn)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="red" @click.stop="deleteLocation(spawn)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="locations-scroll" ref="locationsScroll">
+                <div class="scroll-fill"></div>
+            </div>
+        </nav>
+    </main>
+    <footer>
+        <div class="selector">
+            <div class="arrow">
+                <inline-svg src="./assets/arrow.svg"></inline-svg>
+            </div>
+            <div class="text" @click="selectSpawn('job')">
+                {{currentJobSpawn?.name}}
+            </div>
+            <div class="arrow reverse">
+                <inline-svg src="./assets/arrow.svg"></inline-svg>
+            </div>
+        </div>
+        <button :style="!isQBCore && {'--color': selectedSpawn?.buttonColor}" :class="isQBCore && 'qbcore'">
+            <inline-svg src="./assets/home.svg" class="home-icon" v-if="isQBCore" @click.stop="selectSpawn('apartment')">
+
+            </inline-svg>
+            <span v-else :style="{'color': selectedSpawn?.buttonText}" @click="selectSpawn()">
+                SPAWN
+            </span>
+        </button>
+        <div class="selector right">
+            <div class="arrow">
+                <inline-svg src="./assets/arrow.svg"></inline-svg>
+            </div>
+            <div class="text" @click="selectSpawn('last')">
+                Last Location
+            </div>
+            <div class="arrow reverse">
+                <inline-svg src="./assets/arrow.svg"></inline-svg>
+            </div>
+        </div>
+    </footer>
+</div>
